@@ -100,7 +100,7 @@ const Episode = ({
 }) => {
   return (
     <tr key={_id} onClick={onClick}>
-      <td> {description} Lorem</td>
+      <td> {description}</td>
       <td> {guest}</td>
       <td> {name}</td>
       <td>

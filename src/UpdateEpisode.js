@@ -132,7 +132,7 @@ const UpdateEpisode = ({ closePopup, episode: initialEpisode }) => {
               disabled={loading}
               onClick={() => closePopup()}
             >
-              Done
+              Close
             </button>
           </div>
 
