@@ -1,25 +1,44 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useState, useEffect } from "react";
+import "./App.css";
+import netlifyIdentity from "netlify-identity-widget";
+import Dashboard from "./Dashboard";
+
+netlifyIdentity.init({
+  container: "#netlify", // container to attach to
+  APIUrl: "https://admin.geeksblabla.com/.netlify/identity" // Absolute url to endpoint.  ONLY USE IN SPECIAL CASES!
+});
 
 function App() {
+  const u = netlifyIdentity.currentUser();
+
+  const [isAuthenticated, setIsAuthenticated] = useState(u !== null);
+  const [user, setUser] = React.useState(u);
+
+  useEffect(() => {
+    netlifyIdentity.on("login", user => {
+      setIsAuthenticated(true);
+      setUser(user);
+      netlifyIdentity.close();
+    });
+    netlifyIdentity.on("logout", () => {
+      setIsAuthenticated(false);
+      setUser({});
+    });
+  }, []);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
+    <React.Fragment>
+      {isAuthenticated ? (
+        <Dashboard user={user} />
+      ) : (
+        <div
+          className="container"
+          style={{ display: "flex", justifyContent: "center" }}
         >
-          Learn React
-        </a>
-      </header>
-    </div>
+          <button onClick={() => netlifyIdentity.open()}>Login</button>
+        </div>
+      )}
+    </React.Fragment>
   );
 }
 
