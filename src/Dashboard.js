@@ -53,7 +53,7 @@ export default function Dashboard() {
                 <th> Guests </th>
                 <th> By </th>
                 <th> verified </th>
-                <th> Date </th>
+                <th> Updated </th>
               </tr>
             </thead>
 

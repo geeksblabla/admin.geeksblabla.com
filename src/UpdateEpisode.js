@@ -66,7 +66,6 @@ const UpdateEpisode = ({ closePopup, episode: initialEpisode }) => {
           <div className="input">
             <label> GUEST(s) : </label>
             <textarea
-              required
               onChange={e => dispatch({ name: "guest", value: e.target.value })}
               placeholder="Guest Name, profile links ..."
               rows="3"
