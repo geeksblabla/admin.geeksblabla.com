@@ -36,7 +36,9 @@ export default function Dashboard() {
           contentStyle={{
             minWidth: "400px",
             borderRadius: "15px",
-            padding: "20px"
+            padding: "20px",
+            maxHeight: "80vh",
+            overflow: "scroll"
           }}
         >
           <UpdateEpisode
