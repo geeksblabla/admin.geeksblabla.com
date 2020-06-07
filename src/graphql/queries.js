@@ -1,8 +1,9 @@
 import gql from "graphql-tag";
 
 export const GET_EPISODES = gql`
-  {
-    allEpisodes {
+  query allEpisodes($size: Int, $cursor: String) {
+    allEpisodes(_size: $size, _cursor: $cursor) {
+      after
       data {
         _id
         _ts

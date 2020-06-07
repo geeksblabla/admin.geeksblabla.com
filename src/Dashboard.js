@@ -14,7 +14,7 @@ export default function Dashboard() {
   const closePopup = () => {
     setOpen(false);
   };
-  const openUpdateModal = episode => {
+  const openUpdateModal = (episode) => {
     setSelectedEpisode(episode);
     setOpen(true);
   };
@@ -38,7 +38,7 @@ export default function Dashboard() {
             borderRadius: "15px",
             padding: "20px",
             maxHeight: "80vh",
-            overflow: "scroll"
+            overflow: "scroll",
           }}
         >
           <UpdateEpisode
@@ -47,28 +47,29 @@ export default function Dashboard() {
             key={selectedEpisode._id}
           />
         </Popup>
-        <div>
-          <table className="episodes">
-            <thead>
-              <tr>
-                <th> Episode Proposal </th>
-                <th> Guests </th>
-                <th> By </th>
-                <th> verified </th>
-                <th> Updated </th>
-              </tr>
-            </thead>
 
-            <Query query={GET_EPISODES}>
-              {({ loading, error, data }) => {
-                if (loading) return <tbody> loading ..... </tbody>;
-                if (error) return `Error! ${error.message}`;
+        <Query query={GET_EPISODES} variables={{ size: 20 }}>
+          {({ loading, error, data, fetchMore }) => {
+            if (loading) return <div> loading ..... </div>;
+            if (error) return `Error! ${error.message}`;
 
-                return (
+            return (
+              <div>
+                <table className="episodes">
+                  <thead>
+                    <tr>
+                      <th> Episode Proposal </th>
+                      <th> Guests </th>
+                      <th> By </th>
+                      <th> verified </th>
+                      <th> Done </th>
+                      <th> Updated </th>
+                    </tr>
+                  </thead>
                   <tbody>
                     {data.allEpisodes.data
                       .sort((a, b) => b._ts - a._ts)
-                      .map(e => (
+                      .map((e) => (
                         <Episode
                           key={e._id}
                           episode={e}
@@ -76,11 +77,39 @@ export default function Dashboard() {
                         />
                       ))}
                   </tbody>
-                );
-              }}
-            </Query>
-          </table>
-        </div>
+                </table>
+
+                <button
+                  onClick={() =>
+                    fetchMore({
+                      query: GET_EPISODES,
+                      variables: { cursor: data.allEpisodes.after, size: 20 },
+                      updateQuery: (previousResult, { fetchMoreResult }) => {
+                        const data = fetchMoreResult.allEpisodes.data;
+                        const after = fetchMoreResult.allEpisodes.after;
+                        return data.length
+                          ? {
+                              allEpisodes: {
+                                __typename:
+                                  previousResult.allEpisodes.__typename,
+                                after,
+                                data: [
+                                  ...previousResult.allEpisodes.data,
+                                  ...data,
+                                ],
+                              },
+                            }
+                          : previousResult;
+                      },
+                    })
+                  }
+                >
+                  load More
+                </button>
+              </div>
+            );
+          }}
+        </Query>
       </div>
     </ApolloProvider>
   );
@@ -88,17 +117,7 @@ export default function Dashboard() {
 
 const Episode = ({
   onClick,
-  episode: {
-    _id,
-    _ts,
-    description,
-    guest,
-    verified,
-    scheduled,
-    done,
-    email,
-    name
-  }
+  episode: { _id, _ts, description, guest, verified, done, name },
 }) => {
   return (
     <tr key={_id} onClick={onClick}>
@@ -108,12 +127,15 @@ const Episode = ({
       <td>
         <input type="checkbox" checked={!!verified} readOnly />
       </td>
+      <td>
+        <input type="checkbox" checked={!!done} readOnly />
+      </td>
       <td>{dateFromTs(_ts)}</td>
     </tr>
   );
 };
 
-const dateFromTs = ts => {
+const dateFromTs = (ts) => {
   const currentDate = new Date(ts / 1000);
   const date = currentDate.getDate();
   const month = currentDate.getMonth(); //Be careful! January is 0 not 1
